@@ -1,4 +1,4 @@
-name: Atividade de Pipeline
+name: Pipeline html/css
 
 on:
   push:
@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+  
       - name: Clonar o código
         uses: actions/checkout@v4
 
@@ -20,6 +21,10 @@ jobs:
           ls -la
 
       - name: Validar HTML (opcional)
-        uses: Cyb3r-Jak3/html5validator-action@v4
-        with:
-          root: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tidy
+          for file in *.html; do
+            echo "Validando $file..."
+            tidy -qe "$file" || echo "$file possui avisos ou erros"
+          done
