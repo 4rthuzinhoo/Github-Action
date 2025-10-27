@@ -1,0 +1,25 @@
+name: Atividade de Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar o código
+        uses: actions/checkout@v4
+
+      - name: Verificar estrutura de arquivos
+        run: |
+          echo "✅ Código HTML e CSS recebidos com sucesso!"
+          ls -la
+
+      - name: Validar HTML (opcional)
+        uses: Cyb3r-Jak3/html5validator-action@v4
+        with:
+          root: .
