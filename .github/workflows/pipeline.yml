@@ -42,7 +42,7 @@ jobs:
   dast_basic:
     name: DAST - OWASP ZAP
     runs-on: ubuntu-latest
-    needs: build
+    needs: sast_basic
 
     steps:
       - name: Clonar código
