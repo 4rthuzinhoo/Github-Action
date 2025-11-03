@@ -1,29 +1,31 @@
 name: Pipeline SAST e DAST
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar codigo
+      - name: Clonar código
         uses: actions/checkout@v4
       - name: Mensagem
         run: echo "Iniciando pipeline de segurança."
 
   sast_basic:
-    name: SAST CodeQL
+    name: SAST - CodeQL
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      security-events: write
-      contents: read 
 
     steps:
-      - name: Clonar codigo (fetch-depth 0)
+      - name: Clonar código (fetch-depth 0)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -31,33 +33,28 @@ jobs:
       - name: Inicializar CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript 
+          languages: javascript
 
-      - name: Executar Analise SAST
+      - name: Executar análise SAST
         uses: github/codeql-action/analyze@v3
 
   dast_basic:
-    name: DAST ZAP
+    name: DAST - OWASP ZAP
     runs-on: ubuntu-latest
     needs: build
-    
-    services:
-      web:
-        image: python:3.9-slim
-        ports:
-          - 8080:8080
-        command: python -m http.server 8080
-    
-    steps:
-      - name: Clonar codigo
-        uses: actions/checkout@v4
-        
-      - name: Aguardar servidor
-        run: sleep 5
 
-      - name: Executar Scan DAST ZAP
+    steps:
+      - name: Clonar código
+        uses: actions/checkout@v4
+
+      - name: Iniciar servidor de teste
+        run: |
+          nohup python3 -m http.server 8080 &
+          sleep 8
+
+      - name: Executar varredura DAST com ZAP
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: http://web:8080
+          target: http://localhost:8080
           fail_action: true
           level: 'High'
